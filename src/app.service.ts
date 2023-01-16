@@ -1,10 +1,20 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MSSQL_CONNECTION } from './constants';
 import * as CryptoJS from 'crypto';
-
+import { dbConnector } from './db/db.module';
+import { ConnectionPool } from 'mssql';
 @Injectable()
 export class AppService {
-  constructor(@Inject(MSSQL_CONNECTION) private conn: any) {}
+  dbConnection: ConnectionPool = null;
+  constructor(private conn: dbConnector) {
+    this.dbConnection = conn.getConnectionPool(
+      process.env.MSSQL_USER,
+      process.env.MSSQL_SERVER,
+      process.env.MSSQL_DATABASE,
+      process.env.MSSQL_PASSWORD,
+      parseInt(process.env.MSSQL_PORT),
+    );
+  }
 
   // async mysqlCallStoredProcedure(msg: string) {
   //returns a promise that resolves to a result set on success
@@ -23,7 +33,7 @@ export class AppService {
 
   async mssqlCallStoredProcedure(username: string) {
     //returns a promise that resolves to a result set on success
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = await db.query(`EXEC get_user  @Username = N'${username}'`);
     console.log(res);
     return { pass: res['recordset'][0]['Password'] };
@@ -58,7 +68,7 @@ export class AppService {
   }
 
   async getUsers(search: string, first: number, max: number) {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = this.parseQueryResponse(
       await db.query(`SELECT * FROM Master_user`),
     );
@@ -66,7 +76,7 @@ export class AppService {
   }
 
   async getUsersCount() {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = await db.query(
       `SELECT COUNT(UserKey) as count FROM Master_user`,
     );
@@ -74,7 +84,7 @@ export class AppService {
   }
 
   async getUserById(username: string) {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = this.parseQueryResponse(
       await db.query(`EXEC get_user  @Username = N'${username}'`),
     );
@@ -82,7 +92,7 @@ export class AppService {
   }
 
   async getUserCredentials(username: string) {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = await db.query(`EXEC get_user  @Username = N'${username}'`);
     const saltRounds = 1000;
     const cred_res = [];
@@ -109,7 +119,7 @@ export class AppService {
   }
 
   async getTutorById(id: string) {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = await db.query(
       `Select * from test.dbo.Master_Tutor_Basic_Info where TutorKey='${id}'`,
     );
@@ -117,7 +127,7 @@ export class AppService {
   }
 
   async getStudentById(id: string) {
-    const db = await this.conn.connect();
+    const db = await this.dbConnection.connect();
     const res = await db.query(
       `Select * from test.dbo.Master_StudentProfile where StudentProfileKey='${id}'`,
     );

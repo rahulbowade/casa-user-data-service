@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { Pool } from 'pg';
 import { createPool } from 'mysql';
 import { ConnectionPool } from 'mssql';
@@ -48,8 +48,33 @@ const mssqlProvider = {
   }),
 };
 
+@Injectable()
+export class dbConnector {
+  getConnectionPool(
+    user: string,
+    server: string,
+    database: string,
+    password: string,
+    port: number,
+  ) {
+    return new ConnectionPool({
+      user: user,
+      server: server,
+      database: database,
+      password: password,
+      port: port,
+      options: {
+        trustedConnection: true,
+        encrypt: true,
+        enableArithAbort: true,
+        trustServerCertificate: true,
+      },
+    });
+  }
+}
+
 @Module({
-  providers: [pgProvider, mysqlProvider, mssqlProvider],
+  providers: [pgProvider, mysqlProvider, mssqlProvider, dbConnector],
   exports: [pgProvider, mysqlProvider, mssqlProvider],
 })
 export class DbModule {}
