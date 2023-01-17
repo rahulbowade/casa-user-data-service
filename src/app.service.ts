@@ -1,5 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { MSSQL_CONNECTION } from './constants';
+import { Injectable } from '@nestjs/common';
 import * as CryptoJS from 'crypto';
 import { dbConnector } from './db/db.module';
 import { ConnectionPool } from 'mssql';
@@ -7,6 +6,13 @@ import { ConnectionPool } from 'mssql';
 export class AppService {
   dbConnection: ConnectionPool = null;
   constructor(private conn: dbConnector) {
+    console.log(
+      process.env.MSSQL_USER,
+      process.env.MSSQL_SERVER,
+      process.env.MSSQL_DATABASE,
+      process.env.MSSQL_PASSWORD,
+      process.env.MSSQL_PORT,
+    );
     this.dbConnection = conn.getConnectionPool(
       process.env.MSSQL_USER,
       process.env.MSSQL_SERVER,
@@ -70,7 +76,7 @@ export class AppService {
   async getUsers(search: string, first: number, max: number) {
     const db = await this.dbConnection.connect();
     const res = this.parseQueryResponse(
-      await db.query(`SELECT * FROM Master_user`),
+      await db.query(`SELECT * FROM upsmfac_casa.dbo.Master_user`),
     );
     return res;
   }
@@ -86,14 +92,18 @@ export class AppService {
   async getUserById(username: string) {
     const db = await this.dbConnection.connect();
     const res = this.parseQueryResponse(
-      await db.query(`EXEC get_user  @Username = N'${username}'`),
+      await db.query(
+        `SELECT * FROM upsmfac_casa.dbo.Master_user where username = N'${username}'`,
+      ),
     );
     return res[0];
   }
 
   async getUserCredentials(username: string) {
     const db = await this.dbConnection.connect();
-    const res = await db.query(`EXEC get_user  @Username = N'${username}'`);
+    const res = await db.query(
+      `SELECT * FROM upsmfac_casa.dbo.Master_user where username = N'${username}'`,
+    );
     const saltRounds = 1000;
     const cred_res = [];
     res.recordset.forEach((ele) => {

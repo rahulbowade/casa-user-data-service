@@ -64,9 +64,9 @@ export class dbConnector {
       password: password,
       port: port,
       options: {
-        trustedConnection: true,
-        encrypt: true,
-        enableArithAbort: true,
+        // trustedConnection: true,
+        // encrypt: true,
+        //   enableArithAbort: true,
         trustServerCertificate: true,
       },
     });
