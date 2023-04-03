@@ -131,7 +131,7 @@ export class AppService {
   async getTutorById(id: string) {
     const db = await this.dbConnection.connect();
     const res = await db.query(
-      `Select * from test.dbo.Master_Tutor_Basic_Info where TutorKey='${id}'`,
+      `Select * from upsmfac_casa.dbo.Master_Tutor_Basic_Info where TutorKey='${id}'`,
     );
     return res.recordset[0];
   }
@@ -139,7 +139,7 @@ export class AppService {
   async getStudentById(id: string) {
     const db = await this.dbConnection.connect();
     const res = await db.query(
-      `Select * from test.dbo.Master_StudentProfile where StudentProfileKey='${id}'`,
+      `Select * from upsmfac_casa.dbo.Master_StudentProfile where StudentProfileKey='${id}'`,
     );
     return res.recordset[0];
   }
