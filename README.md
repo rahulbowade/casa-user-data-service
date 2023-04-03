@@ -13,3 +13,4 @@ It fetches data from CASA DB and provides endpoints for `CASA` keycloak and `lr-
 3. `npm i -g pm2`
 4. `pm2 start npm --name "casa-user-data-service" -- start`
 
+Service will start on PORT 3000
