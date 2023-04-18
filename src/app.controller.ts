@@ -34,6 +34,11 @@ export class AppController {
     return this.appService.getStudentById(params.id);
   }
 
+  @Get('student/:rollnumber')
+  getStudentByRollnumber(@Param() params) {
+    return this.appService.getStudentByRollnumber(params.rollnumber);
+  }
+
   @Get('tutor/:id')
   getTutor(@Param() params) {
     return this.appService.getTutorById(params.id);
