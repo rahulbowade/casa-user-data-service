@@ -144,10 +144,10 @@ export class AppService {
     return res.recordset[0];
   }
 
-  async getStudentByRollnumber(id: string) {
+  async getStudentByRollnumber(id: string, dob:string) {
     const db = await this.dbConnection.connect();
     const res = await db.query(
-      `Select * from upsmfac_casa.dbo.Master_StudentProfile where RollNo='${id}'`,
+      `Select * from upsmfac_casa.dbo.Master_StudentProfile where RollNo='${id}' and DateOfBirth='${dob}'`,
     );
     return res.recordset[0];
   }
