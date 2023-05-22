@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as CryptoJS from 'crypto';
 import { dbConnector } from './db/db.module';
 import { ConnectionPool } from 'mssql';
@@ -138,9 +138,20 @@ export class AppService {
 
   async getStudentById(id: string) {
     const db = await this.dbConnection.connect();
+    console.log("Inside the getStudentById");
+    try{
+    /*const res = await db.query(
+      `Select * from upsmfac_casa.dbo.Master_StudentProfile where StudentProfileKey='${id}'`,*/
     const res = await db.query(
-      `Select * from upsmfac_casa.dbo.Master_StudentProfile where StudentProfileKey='${id}'`,
+      `Select * from upsmfac_casa.dbo.Master_StudentProfile where RollNo='${id}'`,
     );
     return res.recordset[0];
+    } catch(e){
+      console.log(e);
+      throw new HttpException(
+        e.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
